@@ -1,0 +1,6 @@
+
+
+fernando@test.com // password123 // user_id: 34
+
+luis@test.com // password123 // user_id: 35
+

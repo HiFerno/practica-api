@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # Servicio de la API de Express
+  api:
+    build: . # Construye la imagen a partir del Dockerfile en la carpeta actual
+    ports:
+      - "3000:3000" # Mapea el puerto 3000 del contenedor al 3000 de tu máquina
+    volumes:
+      - ./src:/app/src # Sincroniza tu código local con el del contenedor para desarrollo en vivo
+    depends_on:
+      - db # La API no se iniciará hasta que la base de datos esté lista
+    environment:
+      - DATABASE_URL=postgres://user:password@db:5432/mydatabase
+      - JWT_SECRET=este-es-un-secreto-muy-secreto
+
+  # Servicio de la Base de Datos PostgreSQL [cite: 37]
+  db:
+    image: postgres:14-alpine # Usa una imagen oficial y ligera de PostgreSQL
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # Ejecuta nuestro script de creación de tablas al iniciar
+      - postgres_data:/var/lib/postgresql/data # Guarda los datos de la BD para que no se pierdan
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

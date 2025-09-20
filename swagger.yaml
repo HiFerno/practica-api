@@ -1,0 +1,188 @@
+openapi: 3.0.0
+info:
+  title: Practica 1 - API de Blog
+  description: API para la práctica del curso de Programación Web, Universidad Mesoamericana.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+
+paths:
+  #AUTH ENDPOINTS
+  /auth/register:
+    post:
+      summary: 1. Creación de usuario
+      tags: [Auth]
+      security: [] # Endpoint público
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "usuario@test.com"
+                password:
+                  type: string
+                  example: "password123"
+      responses:
+        '201':
+          description: Usuario creado exitosamente.
+
+  /auth/login:
+    post:
+      summary: 2. Inicio de sesión
+      tags: [Auth]
+      security: [] # Endpoint público
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "usuario@test.com"
+                password:
+                  type: string
+                  example: "password123"
+      responses:
+        '200':
+          description: Inicio de sesión exitoso. Devuelve un Bearer token.
+
+  #USER ENDPOINTS
+  /users/{id}:
+    get:
+      summary: 3. Información de usuario
+      tags: [Users]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario a consultar.
+      responses:
+        '200':
+          description: Detalles del usuario.
+    delete:
+      summary: 11. Borrar usuario
+      tags: [Users]
+      description: Elimina el perfil del usuario autenticado. El ID en la URL debe coincidir con el del token.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario a eliminar.
+      responses:
+        '200':
+          description: Usuario eliminado.
+
+  /users/{id}/follow:
+    post:
+      summary: 4. Seguir usuario
+      tags: [Users]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario al que se desea seguir.
+      responses:
+        '200':
+          description: Usuario seguido correctamente.
+    delete:
+      summary: 5. Dejar de seguir usuario
+      tags: [Users]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario al que se desea dejar de seguir.
+      responses:
+        '200':
+          description: Se ha dejado de seguir al usuario.
+
+  #MESSAGE ENDPOINTS
+  /messages:
+    post:
+      summary: 10. Crear mensajes
+      tags: [Messages]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  example: "Este es un nuevo mensaje desde la API."
+      responses:
+        '201':
+          description: Mensaje creado exitosamente.
+
+  /messages/latest:
+    get:
+      summary: 6. Últimos diez mensajes
+      tags: [Messages]
+      security: [] # Endpoint público
+      responses:
+        '200':
+          description: Una lista con los 10 mensajes más recientes.
+
+  /messages/user/{userId}:
+    get:
+      summary: 7. Mensajes específicos de un usuario
+      tags: [Messages]
+      security: [] # Endpoint público
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          description: ID del usuario cuyos mensajes se quieren ver.
+      responses:
+        '200':
+          description: Lista de mensajes del usuario.
+
+  /messages/followed:
+    get:
+      summary: 8. Mensajes de los usuarios seguidos
+      tags: [Messages]
+      description: Devuelve los mensajes de todos los usuarios a los que sigue el usuario autenticado.
+      responses:
+        '200':
+          description: Lista de mensajes de usuarios seguidos.
+
+  /messages/search:
+    get:
+      summary: 9. Búsqueda de mensajes por texto
+      tags: [Messages]
+      security: [] # Endpoint público
+      parameters:
+        - in: query
+          name: term
+          required: true
+          schema:
+            type: string
+          description: Texto a buscar dentro del contenido de los mensajes.
+      responses:
+        '200':
+          description: Lista de mensajes que coinciden con la búsqueda.
